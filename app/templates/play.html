@@ -1,0 +1,26 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<h1>Play Sudoku - {{ difficulty|capitalize }}</h1>
+<p>This is where the Sudoku game will be played.</p>
+
+<div class="game-container">
+    <div class="sudoku-grid">
+        {% for row in range(9) %}
+            <div class="sudoku-row">
+                {% for col in range(9) %}
+                    <input type="text" class="sudoku-cell" maxlength="1" />
+                {% endfor %}
+            </div>
+        {% endfor %}
+    </div>
+
+    <div class="keypad">
+        {% for num in range(1, 10) %}
+            <button class="keypad-key" data-number="{{ num }}">{{ num }}</button>
+        {% endfor %}
+        <button class="keypad-key clear">Clear</button>
+    </div>
+</div>
+
+{% endblock %}
