@@ -150,20 +150,20 @@ class UnifiedSolver:
                 affected.add((start_row + i, start_col + j))
         affected.discard((row, col))  # Exclude the cell itself
         return affected
-    #additional validation tool of the entire board
-    def check_grid_items(self): #verify the validity of each solution within the submatrices. 
+    #additional validation tool of the entire board. Verify the validity of each solution within the submatrices
+    def check_grid_items(self):
         list_bool = []
         for x in range(9):
             list_bool_row = []
             for y in range(9):
-                if self.grid[x][y] == 0:
+                if self.board[x][y] == 0:
                     list_bool_row.append(True)  # Consider empty cells as valid for this context
                 else:
-                    num = self.grid[x][y]
+                    num = self.board[x][y]
                     # Check for number's occurrence in row, column, and box
-                    is_valid = (self.grid[x].count(num) == 1 and
-                                [self.grid[i][y] for i in range(9)].count(num) == 1 and
-                                [self.grid[i][j] for i in range(x//3*3, (x//3+1)*3)
+                    is_valid = (self.board[x].count(num) == 1 and
+                                [self.board[i][y] for i in range(9)].count(num) == 1 and
+                                [self.board[i][j] for i in range(x//3*3, (x//3+1)*3)
                                 for j in range(y//3*3, (y//3+1)*3)].count(num) == 1)
                     list_bool_row.append(is_valid)
             list_bool.append(list_bool_row)
