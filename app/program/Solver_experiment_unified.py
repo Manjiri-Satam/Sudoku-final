@@ -150,7 +150,9 @@ class UnifiedSolver:
                 affected.add((start_row + i, start_col + j))
         affected.discard((row, col))  # Exclude the cell itself
         return affected
+    
     #additional validation tool of the entire board. Verify the validity of each solution within the submatrices
+    
     def check_grid_items(self):
         list_bool = []
         for x in range(9):
@@ -168,3 +170,4 @@ class UnifiedSolver:
                     list_bool_row.append(is_valid)
             list_bool.append(list_bool_row)
         return list_bool
+    
