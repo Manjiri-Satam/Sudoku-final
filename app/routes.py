@@ -1,4 +1,5 @@
 from flask import flash, Blueprint, render_template, request, session, redirect, url_for
+from app import Sudoku
 
 main = Blueprint('main', __name__)
 
