@@ -8,8 +8,9 @@
     <div class="sudoku-grid">
         {% for row in range(9) %}
             <div class="sudoku-row">
-                {% for col in range(9) %}
-                    <input type="text" class="sudoku-cell" maxlength="1" />
+                {% for col in range(9) %}  
+                    {% set index = row * 9 + col %}
+                    <input type="text" class="sudoku-cell" maxlength="1" value="{{ sudoku[index] if sudoku[index] != '.' else '' }}" {% if sudoku[index] != '.' %} readonly {% endif %}/>
                 {% endfor %}
             </div>
         {% endfor %}

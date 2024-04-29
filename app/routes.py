@@ -1,5 +1,5 @@
 from flask import flash, Blueprint, render_template, request, session, redirect, url_for
-from app import Sudoku
+#from app import Sudoku
 
 main = Blueprint('main', __name__)
 
@@ -10,15 +10,18 @@ def home():
 
 @main.route('/easy')
 def easy():
-    return render_template('play.html', difficulty='easy')
+    sudoku = '...3.........8.19.71..5...44......7337...65.8..61.........154......97.....5......'
+    return render_template('play.html', difficulty='easy',sudoku=list(sudoku))
 
 @main.route('/medium')
 def medium():
-    return render_template('play.html', difficulty='medium')
+    sudoku = '....7.....6...2.494.1..6..7.298....6...15....1.4...5..........1..65.....2...4....'
+    return render_template('play.html', difficulty='medium',sudoku=list(sudoku))
 
 @main.route('/hard')
 def hard():
-    return render_template('play.html', difficulty='hard')
+    sudoku = '5..1.764..........413......2.....15.6.......7....754..7.4....6.86.2...1.......3.5'
+    return render_template('play.html', difficulty='hard',sudoku=list(sudoku))
 
 @main.route('/play')
 def play():
