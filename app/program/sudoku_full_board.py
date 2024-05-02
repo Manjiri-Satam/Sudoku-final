@@ -11,7 +11,7 @@ class SudokuGenerator:
         self._fill_diagonal()
         self._fill_remaining(0, self.subgrid_size)
 
-    def _fill_diagonal(self):
+    def _fill_diagonal(self):   
         # Fill diagonal subgrids with random values
         for i in range(0, self.board_size, self.subgrid_size):
             self._fill_subgrid(i, i)
