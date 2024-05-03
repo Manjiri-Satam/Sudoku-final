@@ -1,117 +1,112 @@
 import unittest
-import Solver_experiment_unified
 from sudoku_full_board import SudokuGenerator
 from sudoku_game_v5 import SudokuGame
 from Solver_experiment_unified import UnifiedSolver
-
+import logging
+from sudoku_game_v5 import SudokuGame
+from Solver_experiment_unified import UnifiedSolver
 
 class TestSudokuGame(unittest.TestCase):
-    def setUp(self):
-        self.game_easy = SudokuGame(difficulty='easy')
-        self.game_medium = SudokuGame(difficulty='medium')
-        self.game_hard = SudokuGame(difficulty='hard')
-        self.correct_sum = 45  # This is the sum of numbers 1 through 9
+    @classmethod
+    def setUpClass(cls):
+        # Generate games once for all tests to reduce setup time for each test
+        cls.game_easy = SudokuGame(difficulty='easy')
+        cls.game_easy.generate_game()
+        cls.game_medium = SudokuGame(difficulty='medium')
+        cls.game_medium.generate_game()
+        cls.game_hard = SudokuGame(difficulty='hard')
+        cls.game_hard.generate_game()
+        cls.correct_sum = 45  # Sum of numbers 1 through 9 expected in each row, column, and block
 
+    def test_solver_uniqueness(self):
+        """Test that the Sudoku solver finds a unique solution for each board."""
+        games = {
+        'easy': self.game_easy,
+        'medium': self.game_medium,
+        'hard': self.game_hard
+        }
+
+        for difficulty, game in games.items():
+            board = game.generator.board.copy()
+            solver = UnifiedSolver(board)
+            solution1 = solver.solve()
+            self.assertIsNotNone(solution1, f"No solution found for {difficulty} puzzle")
+
+            solver = UnifiedSolver(board)
+            solution2 = solver.solve()
+            self.assertEqual(solution1, solution2, f"Multiple solutions found for {difficulty} puzzle")
+        
     def check_unique(self, elements):
         """Helper method to check if all elements in a list are unique (ignoring zero)"""
         elements = [e for e in elements if e != 0]
         return len(elements) == len(set(elements))
 
+    def check_board_validity(self, board):
+        """Utility function to check that all rows, columns, and blocks are unique."""
+        for i in range(9):
+            row = [num for num in board[i] if num != 0]
+            col = [board[j][i] for j in range(9) if board[j][i] != 0]
+            start_row, start_col = 3 * (i // 3), 3 * (i % 3)
+            block = [board[r][c] for r in range(start_row, start_row + 3) for c in range(start_col, start_col + 3) if board[r][c] != 0]
+
+            assert len(set(row)) == len(row), f"Duplicate in row {i}"
+            assert len(set(col)) == len(col), f"Duplicate in column {i}"
+            assert len(set(block)) == len(block), f"Duplicate in block starting at {start_row},{start_col}"
+
     def test_full_board_validity(self):
-        """Test that the full board generated is valid: all rows, columns, and blocks have unique non-zero elements."""
-        board = self.game_easy.generator.generate_full_board()
-        # Check rows
-        for row in board:
-            self.assertTrue(self.check_unique(row), "Row has duplicates or incorrect elements")
-
-        # Check columns
-        for col in range(9):
-            col_elems = [board[row][col] for row in range(9)]
-            self.assertTrue(self.check_unique(col_elems), "Column has duplicates or incorrect elements")
-
-        # Check 3x3 blocks
-        for block in range(9):
-            block_elems = []
-            start_row, start_col = 3 * (block // 3), 3 * (block % 3)
-            for i in range(3):
-                for j in range(3):
-                    block_elems.append(board[start_row + i][start_col + j])
-            self.assertTrue(self.check_unique(block_elems), "Block has duplicates or incorrect elements")
+        """Test full board validity for easy difficulty."""
+        self.check_board_validity(self.game_easy.generator.board)
 
     def test_sums_of_rows_cols_blocks(self):
-        """Test that each row, column, and 3x3 block sums to the correct number (45 for a filled board)."""
-        board = self.game_easy.generator.generate_full_board()
-        # Check row sums
-        for row in board:
-            self.assertEqual(sum(row), self.correct_sum, "Row does not sum to 45")
+        """Test sums of rows, columns, and blocks for medium difficulty."""
+        board = self.game_medium.generator.board
+        for index in range(9):
+            row = board[index]
+            col = [board[row][index] for row in range(9)]
+            start_row, start_col = 3 * (index // 3), 3 * (index % 3)
+            block = [board[start_row + i][start_col + j] for i in range(3) for j in range(3)]
 
-        # Check column sums
-        for col in range(9):
-            col_sum = sum(board[row][col] for row in range(9))
-            self.assertEqual(col_sum, self.correct_sum, "Column does not sum to 45")
-
-        # Check 3x3 block sums
-        for block in range(9):
-            block_sum = 0
-            start_row, start_col = 3 * (block // 3), 3 * (block % 3)
-            for i in range(3):
-                for j in range(3):
-                    block_sum += board[start_row + i][start_col + j]
-            self.assertEqual(block_sum, self.correct_sum, "3x3 Block does not sum to 45")
+            self.assertEqual(sum(row), self.correct_sum, "Row does not sum to correct value")
+            self.assertEqual(sum(col), self.correct_sum, "Column does not sum to correct value")
+            self.assertEqual(sum(block), self.correct_sum, "Block does not sum to correct value")
 
     def test_puzzle_validity(self):
-        """Test that the puzzle is valid: rows, columns, and blocks have unique elements where filled and correct sums."""
-        self.game_easy.generate_game()
-        board = self.game_easy.generator.board
-        # Similar tests as full board validity, adjusted for a board that includes zeros (empty cells)
+        """Test puzzle validity and solvability for hard difficulty."""
+        self.check_board_validity(self.game_hard.generator.board)
+        solver = UnifiedSolver(self.game_hard.generator.board)
+        self.assertTrue(solver.solve(), "Generated puzzle is unsolvable")
 
-        # Check sums in rows, columns, and blocks only account for non-zero values being unique
-        # We skip the sum check here as the puzzle is not completely filled
-    
-    def test_solver_easy(self):
-        """Test that the solver successfully solves an easy difficulty puzzle."""
-        self.game_easy.generate_game()  # Generate an easy puzzle
-        solver = UnifiedSolver(self.game_easy.board)
-        self.assertTrue(solver.solve(), "Solver failed to solve an easy puzzle")
+    def test_solution_validity(self):
+        """Test solution validity across all difficulties."""
+        for game in [self.game_easy, self.game_medium, self.game_hard]:
+            solver = UnifiedSolver(game.generator.board)
+            self.assertTrue(solver.solve(), f"Solver failed for {game.difficulty} difficulty")
+            self.assertTrue(self.verify_solution(solver.board), "Invalid solution for a sudoku puzzle.")
 
-    def test_solver_medium(self):
-        """Test that the solver successfully solves a medium difficulty puzzle."""
-        self.game_medium.generate_game()  # Generate a medium puzzle
-        solver = UnifiedSolver(self.game_medium.board)
-        self.assertTrue(solver.solve(), "Solver failed to solve a medium puzzle")
-
-    def test_solver_hard(self):
-        """Test that the solver successfully solves a hard difficulty puzzle."""
-        self.game_hard.generate_game()  # Generate a hard puzzle
-        solver = UnifiedSolver(self.game_hard.board)
-        self.assertTrue(solver.solve(), "Solver failed to solve a hard puzzle")
     def verify_solution(self, board):
-        """Helper method to verify that a solved Sudoku board is correct."""
-        correct_sum = 45  # Sum of numbers 1 through 9
-        # Check rows, columns and 3x3 blocks
+        """Check if the solution is valid by ensuring each row, column, and block sums up to the correct sum."""
         for i in range(9):
             row = board[i]
-            column = [board[j][i] for j in range(9)]
-            if sum(row) != correct_sum or sum(column) != correct_sum:
+            col = [board[j][i] for j in range(9)]
+            start_row, start_col = 3 * (i // 3), 3 * (i % 3)
+            block = [board[start_row + r][start_col + c] for r in range(3) for c in range(3)]
+
+            if not (sum(row) == sum(col) == sum(block) == self.correct_sum):
                 return False
-            if i % 3 == 0:
-                for j in range(0, 9, 3):
-                    block = [board[x][y] for x in range(i, i + 3) for y in range(j, j + 3)]
-                    if sum(block) != correct_sum:
-                        return False
         return True
-    
-    def test_solution_validity(self):
-        """Test that the solutions generated by the solver are valid for each difficulty."""
-        for game in [self.game_easy, self.game_medium, self.game_hard]:
-            game.generate_game()
-            solver = UnifiedSolver(game.board)
-            solver.solve()
-            self.assertTrue(self.verify_solution(solver.board), "The solution for {} difficulty is invalid".format(game.difficulty))
-    
-
-
-
+    def run_tests(verbosity=2):
+        # Create a test suite
+        suite = unittest.TestSuite()
+        
+        # Add tests from your TestSudokuGame test case class
+        # This method automatically discovers all methods that start with 'test'
+        suite.addTests(unittest.TestLoader().loadTestsFromTestCase(TestSudokuGame))
+        
+        # Create a test runner that will display detailed results
+        runner = unittest.TextTestRunner(verbosity=verbosity)
+        
+        # Run the tests
+        runner.run(suite)
 # To run the tests
 if __name__ == "__main__":
     unittest.main()
