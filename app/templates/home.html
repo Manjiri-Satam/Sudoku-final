@@ -1,17 +1,18 @@
 {% extends 'layout.html' %}
 
 {% block content %}
-<h1>Welcome, {{ username }}!</h1>
-{% if username == 'Guest' %}
-<p>You are currently not logged in. <a href="{{ url_for('main.login') }}">Log in</a> to set a username for yourself, or continue browsing as a guest.</p>
-{% else %}
-<p>This is the home page of the Sudoku app.</p>
-{% endif %}
+<div class="centered-content">
+    <h1>Welcome, {{ username }}!</h1>
+    {% if username == 'Guest' %}
+    <p>You are currently not logged in. <a href="{{ url_for('main.login') }}">Log in</a> to set a username for yourself, or continue browsing as a guest.</p>
+    {% else %}
+    <p>This is the home page of the Sudoku app.</p>
+    {% endif %}
 
-<div>
-    <a href="{{ url_for('main.easy') }}" class="button">Easy</a>
-    <a href="{{ url_for('main.medium') }}" class="button">Medium</a>
-    <a href="{{ url_for('main.hard') }}" class="button">Hard</a>
-    <a href="{{ url_for('main.login') }}" class="button">Login</a>
+    <div class="button-container">
+        <a href="{{ url_for('main.easy') }}" class="button">Easy</a>
+        <a href="{{ url_for('main.medium') }}" class="button">Medium</a>
+        <a href="{{ url_for('main.hard') }}" class="button">Hard</a>
+    </div>
 </div>
-{% endblock %}
+{% endblock %}block %}

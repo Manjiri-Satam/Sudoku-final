@@ -6,6 +6,26 @@ body, html {
     color: #333; /* Dark grey text */
 }
 
+.content-wrapper {
+    background-color: #fff8dc; /* Light brown, resembling a cork board */
+    border: 1px solid #deb887; /* Border color for the bulletin board effect */
+    padding: 40px; /* Generous padding around the text */
+    margin: 50px auto; /* Top and bottom margin with auto horizontal margins for centering */
+    max-width: 800px; /* Maximum width of the content area */
+    box-shadow: 0 0 15px rgba(0,0,0,0.2); /* Subtle shadow for a layered effect */
+    text-align: center; /* Center align the text */
+}
+
+h1 {
+    margin-bottom: 20px; /* Space below the header */
+    color: #333; /* Dark grey color for contrast */
+}
+
+p {
+    font-size: 1.2rem; /* Slightly larger font size for readability */
+    line-height: 1.6; /* Increased line height for better readability */
+}
+
 .navbar {
     background-color: #333; /* Dark background for navbar */
     overflow: hidden;
@@ -25,9 +45,28 @@ body, html {
     color: black;
 }
 
+footer {
+    background-color: #333;
+    color: white;
+    text-align: center;
+    padding: 1px;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+}
+
 main {
     padding: 20px;
     margin-top: 20px;
+}
+
+.centered-content {
+    display: flex;          /* Enables flexbox */
+    flex-direction: column; /* Stack children vertically */
+    align-items: center;    /* Center-align items horizontally */
+    justify-content: center;/* Center-align items vertically (optional, if you want full-page centering) */
+    height: 100vh;          /* Full viewport height (optional, for full-page vertical centering) */
+    text-align: center;     /* Ensures text inside the div is centered as well */
 }
 
 .flash-messages {
@@ -47,6 +86,11 @@ footer {
     position: fixed;
     bottom: 0;
     width: 100%;
+}
+
+#submit-container {
+    text-align: center;
+    margin-top: 20px;
 }
 
 .button {
@@ -113,11 +157,12 @@ footer {
 #grid-container {
     display: grid;
     grid-template-columns: repeat(9, 40px); /* 9 columns, each 40px wide */
-    grid-gap: 1px; /* 1px gap between grid items */
+    grid-gap: 0;
+    border: 2px solid black;
     background-color: var(--tableColor); /* use color variable for gaps to appear as lines */
     padding: 1px; /* to prevent the outermost cells from being cut off */
     margin: 0 auto; /* center the grid horizontally and set top and bottom margin to 0 */
-    max-width: 400px; /* optional: limit the maximum width of the grid */
+    max-width: 360px; /* optional: limit the maximum width of the grid */
 }
 
 
@@ -143,17 +188,10 @@ footer {
 }
 
 #grid-container > .grid-item:nth-of-type(3n) .txt-input {
-    border-right: 2px solid var(--shiftIndication); /* right border every third cell */
+    border-right: 2px solid black;
 }
 
-#grid-container > .grid-item:nth-of-type(n+73) .txt-input {
-    border-bottom: 2px solid var(--shiftIndication); /* bottom border for the last three rows */
-}
-
-/* Cancel out the thick borders on the rightmost and bottommost cells */
-#grid-container > .grid-item:nth-of-type(9n) .txt-input {
-    border-right: none;
-}
-#grid-container > .grid-item:nth-last-child(-n+9) .txt-input {
-    border-bottom: none;
+#grid-container > .grid-item:nth-of-type(n+19):nth-of-type(-n+27) .txt-input,
+#grid-container > .grid-item:nth-of-type(n+46):nth-of-type(-n+54) .txt-input {
+    border-bottom: 2px solid black;
 }
