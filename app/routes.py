@@ -1,5 +1,5 @@
-from flask import flash, Blueprint, render_template, request, session, redirect, url_for
-#from app import Sudoku
+from flask import Flask, request, jsonify, flash, Blueprint, render_template, request, session, redirect, url_for
+from app.program.Solver_experiment_unified import UnifiedSolver
 
 main = Blueprint('main', __name__)
 
@@ -61,3 +61,18 @@ def login():
         flash('Logged in successfully!', 'success')
         return redirect(url_for('main.home'))
     return render_template('login.html')
+
+@main.route('/validate-sudoku', methods=['POST'])
+def validate_sudoku():
+    data = request.get_json()
+    if not data or 'grid' not in data:
+        return jsonify({'error': 'Invalid data'}), 400
+
+    # Assuming grid is a 2D list of integers representing the Sudoku board
+    grid = data['grid']
+    solver = UnifiedSolver(grid)  # Initialize your solver with the board
+    results = solver.check_grid_items()
+
+    # Determine if the Sudoku solution is valid
+    is_valid = all(all(row) for row in results)
+    return jsonify({'is_valid': is_valid})

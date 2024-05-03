@@ -1,29 +1,35 @@
-// List of functions we need :
-// A function to handle the selection of cells such as selectCell(row, column)
-// A function to select a number from keypad such as selectNumber(number)
-// A function to clear the selected cell such as clearCell()
-// A function to highlight the wrong cell such as wrongCell(cells)
-// A function to start the timer when the page is loaded such as readyTimer()
-// A function to update the timer such as updateTimer()
-// A function to pause the timer such as pauseTimer()
-// A function to open a resume pop-up page such as resume()
-// A function to request a hint such as requestHint()
-// A function to solve the sudoku such as solveSudoku()
-// A function to reset the sudoku such as resetSudoku()
-// A function to start a new puzzle such as newSudoku()
+document.addEventListener('DOMContentLoaded', function() {
+    const cells = document.querySelectorAll('.txt-input'); // Select all cells in the Sudoku grid
+    const keypadKeys = document.querySelectorAll('.keypad-key'); // Select all keypad keys
 
-// But we also need classes for the timer such as start(), stop(), reset(), update()
+    // Add event listener to each cell in the Sudoku grid
+    cells.forEach(function(cell) {
+        cell.addEventListener('click', function() {
+            // Remove focus from other cells
+            cells.forEach(function(c) {
+                c.classList.remove('focused');
+            });
 
-keypadKeys.forEach(function(key) {
-    key.addEventListener("click", function() {
-        console.log("Key clicked:", this.dataset.number);
-        const number = this.dataset.number;
-        const selectedCell = document.querySelector(".sudoku-cell:focus");
-        console.log("Selected cell:", selectedCell);
+            // Add focus to the clicked cell
+            cell.classList.add('focused');
+        });
+    });
 
-        if (selectedCell) {
-            selectedCell.value = number;
-            console.log("Value assigned to cell:", selectedCell.value);
-        }
+    // Add event listener to each keypad key
+    keypadKeys.forEach(function(key) {
+        key.addEventListener('click', function() {
+            // Get the number from the clicked keypad key
+            const number = this.innerText;
+
+            // Get the selected cell (if any)
+            const selectedCell = document.querySelector('.focused');
+
+            // If a cell is selected and the button clicked is not "Clear", assign the number to its value
+            if (selectedCell && number !== 'Clear') {
+                selectedCell.value = number;
+            } else if (selectedCell && number === 'Clear') { // If "Clear" button is clicked, clear the value of the selected cell
+                selectedCell.value = '';
+            }
+        });
     });
 });

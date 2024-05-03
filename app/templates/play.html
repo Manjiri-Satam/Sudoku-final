@@ -4,23 +4,39 @@
 <h1>Play Sudoku - {{ difficulty|capitalize }}</h1>
 <p>This is where the Sudoku game will be played.</p>
 
-<div id="grid-container">
-    {% for i in range(9) %}
-        {% for j in range(9) %}
-            {% set index = i*9 + j %}
-            {% set value = sudoku[index] %}
-            {% if value == '.' %}
-                <div class="grid-item">
-                    <input id="{{ index }}" name="{{ index }}" type="text" maxlength="1" inputmode="numeric" pattern="[1-9]" class="txt-input" autocomplete="off">
-                </div>
-            {% else %}
-                <div class="grid-item">
-                    <input id="{{ index }}" name="{{ index }}" type="text" maxlength="1" pattern="[1-9]" class="txt-input" value="{{ value }}" readonly>
-                </div>
-            {% endif %}
+<div class="game-container">
+    <div id="grid-container">
+        {% for i in range(9) %}
+            {% for j in range(9) %}
+                {% set index = i*9 + j %}
+                {% set value = sudoku[index] %}
+                {% if value == '.' %}
+                    <!-- Editable field for user inputs -->
+                    <div class="grid-item">
+                        <input id="{{ index }}" name="{{ index }}" type="text" maxlength="1" inputmode="numeric" pattern="[1-9]" class="txt-input user-editable" autocomplete="off">
+                    </div>
+                {% else %}
+                    <!-- Non-editable field, pre-filled with initial Sudoku numbers -->
+                    <div class="grid-item">
+                        <input id="{{ index }}" name="{{ index }}" type="text" maxlength="1" pattern="[1-9]" class="txt-input" value="{{ value }}" readonly>
+                    </div>
+                {% endif %}
+            {% endfor %}
         {% endfor %}
-    {% endfor %}
+    </div>
+
+    <div id="submit-container">
+        <button id="submit-sudoku" class="button">Check Solution</button>
+        <button class="button clear">Clear</button>
+    </div>
+
+    <div id="keypad" class="keypad">
+        {% for num in range(1, 10) %}
+            <button class="keypad-key" data-value="{{ num }}">{{ num }}</button>
+        {% endfor %}
+    </div>
 </div>
+
 
 <script>
     // JavaScript to validate input fields
@@ -29,6 +45,46 @@
             // Remove any non-digit characters
             this.value = this.value.replace(/[^1-9]/g, '');
         });
+    });
+
+    document.getElementById('submit-sudoku').addEventListener('click', function() {
+        var inputs = document.querySelectorAll('.txt-input');
+        var allFilled = true;
+
+        inputs.forEach(function(input) {
+            if (input.value.trim() === '') {
+                allFilled = false;
+            }
+        });
+
+        if (!allFilled) {
+            alert("Please fill all cells with numbers 1-9.");
+        } else {
+            // Perform AJAX request to validate Sudoku solution
+            var grid = [];
+            for (let i = 0; i < 9; i++) {
+                grid[i] = [];
+                for (let j = 0; j < 9; j++) {
+                    let cell = inputs[i * 9 + j].value.trim();
+                    grid[i][j] = cell ? parseInt(cell) : 0;  // Convert to integer, 0 for empty cells
+                }
+            }
+
+            fetch('/validate-sudoku', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({grid: grid})
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.is_valid) {
+                    alert("Congratulations! The Sudoku solution is correct.");
+                } else {
+                    alert("Incorrect solution. Please try again.");
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        }
     });
 </script>
 
