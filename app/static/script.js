@@ -1,6 +1,7 @@
 document.addEventListener('DOMContentLoaded', function() {
     const cells = document.querySelectorAll('.txt-input'); // Select all cells in the Sudoku grid
     const keypadKeys = document.querySelectorAll('.keypad-key'); // Select all keypad keys
+    const clearButton = document.querySelector('.clear'); // Select the clear button
 
     // Add event listener to each cell in the Sudoku grid
     cells.forEach(function(cell) {
@@ -15,6 +16,15 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
+    // JavaScript to handle the clear button
+    document.querySelector('.clear').addEventListener('click', function() {
+        // Clear only user-editable input fields
+        document.querySelectorAll('.txt-input.user-editable').forEach(function(input) {
+            input.value = ''; // Clear input value
+        });
+    });
+
+
     // Add event listener to each keypad key
     keypadKeys.forEach(function(key) {
         key.addEventListener('click', function() {
@@ -27,8 +37,6 @@ document.addEventListener('DOMContentLoaded', function() {
             // If a cell is selected and the button clicked is not "Clear", assign the number to its value
             if (selectedCell && number !== 'Clear') {
                 selectedCell.value = number;
-            } else if (selectedCell && number === 'Clear') { // If "Clear" button is clicked, clear the value of the selected cell
-                selectedCell.value = '';
             }
         });
     });

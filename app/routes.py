@@ -11,9 +11,11 @@ sudoku_list = sudoku_data.to_dict(orient='records')
 print(sudoku_list[:5])
 
 def get_sudoku_by_difficulty(sudoku_list, level):
+    # Filter the Sudoku puzzles by the specified difficulty level
     filtered_sudokus = [s for s in sudoku_list if s['difficulty_level'] == level]
     if not filtered_sudokus:
         raise ValueError(f"No Sudoku puzzles found for difficulty: {level}")
+    # Return a random Sudoku puzzle from the filtered list
     return random.choice(filtered_sudokus)
 
 main = Blueprint('main', __name__)

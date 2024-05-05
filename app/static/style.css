@@ -71,6 +71,13 @@ main {
 #submit-container {
     text-align: center;
     margin-top: 20px;
+    display: flex;         /* Flexbox for inline layout */
+    justify-content: center; /* Center the buttons horizontally */
+    gap: 10px;             /* Space between the buttons */
+}
+
+.button-container {
+    margin-top: 20px;       /* Adds some space above the button container */
 }
 
 .button {
@@ -99,6 +106,18 @@ main {
     margin: auto; /* Center the keypad */
 }
 
+.keypad-key {
+    padding: 10px; /* Adjust padding for better button sizing */
+    font-size: 1.5rem; /* Larger font size for readability */
+    background-color: #f0f0f0; /* Light grey background */
+    border: none; /* Removes the border */
+    cursor: pointer; /* Changes cursor to pointer on hover */
+}
+
+.keypad-key:hover {
+    background-color: #e0e0e0; /* Slightly darker grey on hover */
+}
+
 .row {
     display: contents;
 }
@@ -112,22 +131,6 @@ main {
     align-items: center;
 }
 
-.keypad-key {
-    padding: 10px; /* Adjust padding for better button sizing */
-    font-size: 1.5rem; /* Larger font size for readability */
-    background-color: #f0f0f0; /* Light grey background */
-    border: none; /* Removes the border */
-    cursor: pointer; /* Changes cursor to pointer on hover */
-}
-
-.keypad-key:hover {
-    background-color: #e0e0e0; /* Slightly darker grey on hover */
-}
-
-.clear {
-    grid-column: 1 / span 3; /* Makes the Clear button span all 3 columns */
-}
-
 .game-container {
     display: flex;
     justify-content: space-around;
@@ -137,14 +140,12 @@ main {
 #grid-container {
     display: grid;
     grid-template-columns: repeat(9, 40px); /* 9 columns, each 40px wide */
-    grid-gap: 0;
-    border: 2px solid black;
+    grid-gap: 1px; /* 1px gap between grid items */
     background-color: var(--tableColor); /* use color variable for gaps to appear as lines */
     padding: 1px; /* to prevent the outermost cells from being cut off */
     margin: 0 auto; /* center the grid horizontally and set top and bottom margin to 0 */
-    max-width: 360px; /* optional: limit the maximum width of the grid */
+    max-width: 400px; /* optional: limit the maximum width of the grid */
 }
-
 
 .grid-item {
     background-color: #ffffff;
@@ -165,6 +166,11 @@ main {
     background-color: var(--itemBackground);
     color: var(--textColor);
     box-sizing: border-box;
+}
+
+.txt-input.focused {
+    background-color: lightblue; /* Change the background color when focused */
+    outline: none; /* Remove default focus outline */
 }
 
 #grid-container > .grid-item:nth-of-type(3n) .txt-input {

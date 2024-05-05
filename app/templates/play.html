@@ -2,7 +2,6 @@
 
 {% block content %}
 <h1>Play Sudoku - {{ difficulty|capitalize }}</h1>
-<p>This is where the Sudoku game will be played.</p>
 
 <div class="game-container">
     <div id="grid-container">
@@ -35,8 +34,6 @@
             <button class="keypad-key" data-value="{{ num }}">{{ num }}</button>
         {% endfor %}
     </div>
-</div>
-
 
 <script>
     // JavaScript to validate input fields
@@ -47,6 +44,15 @@
         });
     });
 
+    // JavaScript to handle the clear button
+    document.querySelector('.clear').addEventListener('click', function() {
+        // Clear all user-editable input fields
+        document.querySelectorAll('.txt-input.user-editable').forEach(function(input) {
+            input.value = ''; // Clear input value
+        });
+    });
+
+    // Event listener for the submit button
     document.getElementById('submit-sudoku').addEventListener('click', function() {
         var inputs = document.querySelectorAll('.txt-input');
         var allFilled = true;
