@@ -22,7 +22,7 @@ class UnifiedSolver:
                 self.possible_values[r][c].add(num)   
 
     def solve(self):
-        if self.difficulty == 'easy' or self.difficulty == 'auto':
+        if self.difficulty == 'easy': #For very easy puzzles, use basic solve as it will be faster if no recursion is needed.
             return self.basic_solve()
         else:
             return self.advanced_solve()
