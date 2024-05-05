@@ -7,6 +7,14 @@ class UnifiedSolver:
         if difficulty == 'hard': #this part of the code is for the advance_solver. Compute all possible values per cell, and then uses the constrained function to select those cells with the least amount of possible values. 
             self.compute_possible_values()
 
+    def validate_board(self, board): #function to validate a correct board of 9x9 size.
+        if len(board) != 9 or any(len(row) != 9 for row in board):
+            return False
+        if any(not (0 <= cell <= 9) for row in board for cell in row):
+            return False
+        return True
+
+
     def compute_possible_values(self): # Computes possible numbers for each cell based on the current state of the board.
         for i in range(9):
             for j in range(9):
@@ -15,6 +23,8 @@ class UnifiedSolver:
 
     def update_possible_values(self, row, col, num, is_placing): #once a cell is selected, and a number is input, then it updates the possible values for all affected cells by this input number. 
         affected_cells = self.get_affected_cells(row, col)
+        if not affected_cells_
+            raise Exception("No affected cells found.")
         if is_placing: #this determines if the number is being places or not (so to update or not)
             for r, c in affected_cells:
                 self.possible_values[r][c].discard(num)
@@ -68,6 +78,7 @@ class UnifiedSolver:
             for j in range(9):
                 if self.board[i][j] == 0:
                     return (i, j)
+        print("Warning: no empty location found; check if all is complete")
         return None
 
     def find_most_constrained_location(self): #find the most constrained parts of the puzzle to make it easier to solve. 
@@ -85,6 +96,8 @@ class UnifiedSolver:
         return best_spot
 
     def is_valid(self, row, col, num): #checks the validity of the number input based on Sudoku's rules. 
+        if not ( 1 <= num <= 9):
+            raise ValueError("Attempted to place an invalid number outside the range 1-9.")
         for x in range(9):
             if self.board[row][x] == num or self.board[x][col] == num:
                 return False
