@@ -45,14 +45,27 @@ class SudokuGame:
                 current_clues -= 2  # Two numbers are removed in each successful operation
 
     def _remove_symmetric_numbers(self):
-        for _ in range(100):  # A limit to avoid infinite loops
+        for _ in range(20):  # A limit to avoid infinite loops
             row, col = random.randint(0, self.board_size - 1), random.randint(0, self.board_size - 1)
             row_opp, col_opp = self.board_size - 1 - row, self.board_size - 1 - col
             if self.generator.board[row][col] != 0 and self.generator.board[row_opp][col_opp] != 0:
+                # Make copies of the numbers being removed for potential restoration
+                num1_removed = self.generator.board[row][col]
+                num2_removed = self.generator.board[row_opp][col_opp]
+
+                # Temporarily remove the numbers
                 self.generator.board[row][col] = 0
                 self.generator.board[row_opp][col_opp] = 0
-                return True  # Successful removal
+
+                # Check if the puzzle is still valid
+                if self._check_puzzle_validity():
+                    return True  # Successful removal
+                else:
+                    # If not, revert the removal
+                    self.generator.board[row][col] = num1_removed
+                    self.generator.board[row_opp][col_opp] = num2_removed
         return False  # Failed to remove after many tries
+
 
 
     def _has_single_solution(self):
@@ -84,3 +97,5 @@ sudoku_game = SudokuGame(difficulty='hard')
 sudoku_game.generate_game()
 sudoku_game.print_board()
 
+solver = UnifiedSolver(sudoku_game.generator.board)
+print(solver.has_single_solution())
