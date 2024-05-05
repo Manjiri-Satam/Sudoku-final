@@ -79,7 +79,7 @@ class UnifiedSolver:
                     best_spot = (i, j)
                 elif self.board[i][j] == 0 and len(self.possible_values[i][j]) == min_options:
                     if random.random() >= 0.9:
-                         best_spot = (i,j) #Adding randomisation in solving order for unique solution check
+                         best_spot = (i,j) #Adding randomisation in solving order for unique solution check (0.9 chosen emperically by allowing the rate to vary and seeing which had highest detection rates).
                     
         return best_spot
 
@@ -127,44 +127,24 @@ class UnifiedSolver:
             list_bool.append(list_bool_row)
         return list_bool
     
-    def has_single_solution(self):
+    def has_single_solution(self, attempts=50): #check if the puzzle has a single solution, default is 50 attempts as this was found to have 100% accuracy rate for our test set of sudokus without unique solutions. 
         initial_board = copy.deepcopy(self.board)
-        # Try to find the first solution
         self.compute_possible_values()
         self.advanced_solve()
         first_solution = copy.deepcopy(self.board)
 
-        # Try to find a second solution
-        self.board = [[cell for cell in row] for row in initial_board]  # Reset the board
-        self.possible_values = [[set(range(1, 10)) if cell == 0 else set() for cell in row] for row in self.board]  # Reset possible values
-        self.compute_possible_values()
-        self.advanced_solve()
-        second_solution = copy.deepcopy(self.board)
-        
-        if not (second_solution == first_solution):
-            return False
-        
-        # Try to find a third solution
-        self.board = [[cell for cell in row] for row in initial_board]  # Reset the board
-        self.possible_values = [[set(range(1, 10)) if cell == 0 else set() for cell in row] for row in self.board]  # Reset possible values
-        self.compute_possible_values()
-        self.advanced_solve()
-        third_solution = copy.deepcopy(self.board)
-        
-        if not(second_solution == first_solution == third_solution):
-            return False
-        
-        
-        self.board = [[cell for cell in row] for row in initial_board]
-        self.possible_values = [[set(range(1, 10)) if cell == 0 else set() for cell in row] for row in self.board]
-        self.compute_possible_values()
-        self.advanced_solve()
-        fourth_solution = copy.deepcopy(self.board)
-        
-        #We only run three passes as otherwise the function would be too slow, from four iterations we found about a 92.4% chance of a board with no unique solution to be detected.
-        
-        if not(second_solution == first_solution == third_solution == fourth_solution):
-            return False
-        else:
-            return True
+        for _ in range(attempts):
+            # Reset the board for the next attempt
+            self.board = [[cell for cell in row] for row in initial_board]
+            self.possible_values = [[set(range(1, 10)) if cell == 0 else set() for cell in row] for row in self.board]
+            
+            self.compute_possible_values()
+            self.advanced_solve()
+            current_solution = copy.deepcopy(self.board)
+
+            if current_solution != first_solution:
+                return False
+
+        return True
+
 
