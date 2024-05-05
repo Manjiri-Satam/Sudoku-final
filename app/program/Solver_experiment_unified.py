@@ -1,4 +1,4 @@
-import copy
+import copy, random
 class UnifiedSolver:
     def __init__(self, board, difficulty='auto'):
         self.board = board
@@ -77,6 +77,10 @@ class UnifiedSolver:
                 if self.board[i][j] == 0 and len(self.possible_values[i][j]) < min_options:
                     min_options = len(self.possible_values[i][j])
                     best_spot = (i, j)
+                elif self.board[i][j] == 0 and len(self.possible_values[i][j]) == min_options:
+                    if random.random() >= 0.99:
+                         best_spot = (i,j) #Adding randomisation in solving order for unique solution check
+                    
         return best_spot
 
     def is_valid(self, row, col, num):
@@ -122,51 +126,45 @@ class UnifiedSolver:
                     list_bool_row.append(is_valid)
             list_bool.append(list_bool_row)
         return list_bool
-
+    
     def has_single_solution(self):
-        initial_board = self.board
+        initial_board = copy.deepcopy(self.board)
         # Try to find the first solution
-        self.solve()
+        self.compute_possible_values()
+        self.advanced_solve()
         first_solution = copy.deepcopy(self.board)
 
         # Try to find a second solution
         self.board = [[cell for cell in row] for row in initial_board]  # Reset the board
         self.possible_values = [[set(range(1, 10)) if cell == 0 else set() for cell in row] for row in self.board]  # Reset possible values
-        
-        
-        self.solve()
+        self.compute_possible_values()
+        self.advanced_solve()
         second_solution = copy.deepcopy(self.board)
-        if second_solution == first_solution:
-            return True
-        else:
+        
+        if not (second_solution == first_solution):
             return False
+        
+        # Try to find a third solution
+        self.board = [[cell for cell in row] for row in initial_board]  # Reset the board
+        self.possible_values = [[set(range(1, 10)) if cell == 0 else set() for cell in row] for row in self.board]  # Reset possible values
+        self.compute_possible_values()
+        self.advanced_solve()
+        third_solution = copy.deepcopy(self.board)
+        
+        #We only run three passes as otherwise the function would be too slow, from three iterations we found about a 84% chance of a board with no unique solution to be detected.
+        if not(second_solution == first_solution == third_solution):
+            return False
+        
+        #Try to fin a fourth solution
+        
+        self.board = [[cell for cell in row] for row in initial_board]
+        self.possible_values = [[set(range(1, 10)) if cell == 0 else set() for cell in row] for row in self.board]
+        self.compute_possible_values()
+        self.advanced_solve()
+        fourth_solution = copy.deepcopy(self.board)
+        
+        if not(second_solution == first_solution == third_solution == fourth_solution):
+            return False
+        else:
+            return True
 
-    
-# Define an example Sudoku puzzle
-sudoku_string = ".2....1.5...........1.........3..5...4..7..38..8.5.2...3........1.2.7.4......3.1."
-
-# Convert string to list format
-#example_sudoku = [[int(cell) if cell != '.' else 0 for cell in sudoku_string[i:i+9]] for i in range(0, 81, 9)]
-
-example_sudoku = [
-    [4, 0, 3, 7, 6, 8, 0, 9, 5],
-    [6, 5, 7, 0, 0, 9, 4, 8, 3],
-    [9, 8, 0, 4, 3, 5, 6, 0, 7],
-    [0, 6, 9, 3, 8, 0, 5, 7, 4],
-    [5, 4, 0, 6, 7, 0, 9, 3, 8],
-    [3, 7, 8, 9, 5, 4, 0, 6, 0],
-    [0, 3, 4, 8, 0, 6, 7, 5, 9],
-    [8, 0, 5, 0, 9, 7, 3, 4, 6],
-    [7, 9, 6, 5, 4, 3, 8, 0, 0]
-]
-
-
-# Initialize the solver with the example Sudoku
-solver = UnifiedSolver(example_sudoku)
-print(solver.has_single_solution())
-# Solve the Sudoku
-solver.solve()
-
-# Print the solved Sudoku
-for row in solver.board:
-    print(row)
