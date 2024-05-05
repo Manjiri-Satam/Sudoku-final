@@ -1,39 +1,40 @@
 import copy, random
 class UnifiedSolver:
-    def __init__(self, board, difficulty='auto'):
-        self.board = board
+    def __init__(self, board, difficulty='auto'): #takes the difficulty level assigned to the sudoku board generated
+        self.board = board #expects a 2D list that represents a sudoku grid 
         self.difficulty = difficulty
-        self.possible_values = [[set(range(1, 10)) if cell == 0 else set() for cell in row] for row in board]
-        if difficulty == 'hard':
+        self.possible_values = [[set(range(1, 10)) if cell == 0 else set() for cell in row] for row in board] #Create al list with all possible values in empty cells.
+        if difficulty == 'hard': #this part of the code is for the advance_solver. Compute all possible values per cell, and then uses the constrained function to select those cells with the least amount of possible values. 
             self.compute_possible_values()
-    def compute_possible_values(self):
+
+    def compute_possible_values(self): # Computes possible numbers for each cell based on the current state of the board.
         for i in range(9):
             for j in range(9):
                 if self.board[i][j] != 0:
                     self.update_possible_values(i, j, self.board[i][j], True)
 
-    def update_possible_values(self, row, col, num, is_placing):
+    def update_possible_values(self, row, col, num, is_placing): #once a cell is selected, and a number is input, then it updates the possible values for all affected cells by this input number. 
         affected_cells = self.get_affected_cells(row, col)
-        if is_placing:
+        if is_placing: #this determines if the number is being places or not (so to update or not)
             for r, c in affected_cells:
                 self.possible_values[r][c].discard(num)
         else:
             for r, c in affected_cells:
                 self.possible_values[r][c].add(num)   
 
-    def solve(self):
+    def solve(self): #to choose or decide which method we'll be using
         if self.difficulty == 'easy': #For very easy puzzles, use basic solve as it will be faster if no recursion is needed.
             return self.basic_solve()
         else:
             return self.advanced_solve()
 
-    def basic_solve(self):
+    def basic_solve(self): #solve board using classic backtracking solution
         empty = self.find_empty_location()
         if not empty:
             return True
         row, col = empty
 
-        for num in range(1, 10):
+        for num in range(1, 10):  #validating step to follow sudoku's rules. 
             if self.is_valid(row, col, num):
                 self.board[row][col] = num
                 if self.basic_solve():
@@ -41,7 +42,7 @@ class UnifiedSolver:
                 self.board[row][col] = 0
         return False
     
-    def advanced_solve(self):
+    def advanced_solve(self): #solves sudokus using a constrained propagation method by selecting the cells with the fewest possible values. 
         empty = self.find_most_constrained_location()
         if not empty:
             return True
@@ -56,13 +57,13 @@ class UnifiedSolver:
                 if self.advanced_solve():
                     return True
 
-                # Backtrack
+                # Backtrack here if the number is not valid. 
                 self.board[row][col] = 0
                 self.possible_values = original_possible_values
 
         return False
 
-    def find_empty_location(self):
+    def find_empty_location(self):  #Finds the first empty location identified by a 0 on the board to attempt to place a number.
         for i in range(9):
             for j in range(9):
                 if self.board[i][j] == 0:
@@ -83,11 +84,11 @@ class UnifiedSolver:
                     
         return best_spot
 
-    def is_valid(self, row, col, num):
+    def is_valid(self, row, col, num): #checks the validity of the number input based on Sudoku's rules. 
         for x in range(9):
             if self.board[row][x] == num or self.board[x][col] == num:
                 return False
-        start_row = 3 * (row // 3)
+        start_row = 3 * (row // 3) #create the three by three sub-matrix to check validity in this inner boxes
         start_col = 3 * (col // 3)
         for i in range(start_row, start_row + 3):
             for j in range(start_col, start_col + 3):
@@ -95,7 +96,7 @@ class UnifiedSolver:
                     return False
         return True
 
-    def get_affected_cells(self, row, col):
+    def get_affected_cells(self, row, col): # Returns a set of cells that are affected by changes in the given cell and thus only updating these affected cells possible values. 
         affected = set()
         for i in range(9):
             affected.add((row, i))
