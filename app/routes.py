@@ -1,27 +1,55 @@
+import pandas as pd
+import os
 from flask import Flask, request, jsonify, flash, Blueprint, render_template, request, session, redirect, url_for
 from app.program.Solver_experiment_unified import UnifiedSolver
+import random
+
+project_root = os.path.dirname(os.path.abspath(__file__))
+csv_path = os.path.join(project_root, 'sudoku_results.csv')
+sudoku_data = pd.read_csv(csv_path)
+sudoku_list = sudoku_data.to_dict(orient='records')
+print(sudoku_list[:5])
+
+def get_sudoku_by_difficulty(sudoku_list, level):
+    filtered_sudokus = [s for s in sudoku_list if s['difficulty_level'] == level]
+    if not filtered_sudokus:
+        raise ValueError(f"No Sudoku puzzles found for difficulty: {level}")
+    return random.choice(filtered_sudokus)
 
 main = Blueprint('main', __name__)
 
 @main.route('/')
 def home():
-    username = session.get('username', 'Guest')
-    return render_template('home.html', username=username)
+    return render_template('home.html')
 
 @main.route('/easy')
 def easy():
-    sudoku = '...3.........8.19.71..5...44......7337...65.8..61.........154......97.....5......'
-    return render_template('play.html', difficulty='easy',sudoku=list(sudoku))
+    try:
+        # Pass both sudoku_list and the level ('easy') to the function
+        puzzle = get_sudoku_by_difficulty(sudoku_list, 'easy')
+        return render_template('play.html', difficulty='easy', sudoku=list(puzzle['sudoku_generated']))
+    except ValueError as e:
+        flash(str(e), 'error')
+        return render_template('home.html')
 
 @main.route('/medium')
 def medium():
-    sudoku = '....7.....6...2.494.1..6..7.298....6...15....1.4...5..........1..65.....2...4....'
-    return render_template('play.html', difficulty='medium',sudoku=list(sudoku))
+    try:
+        # Ensure the correct level ('medium') is passed
+        puzzle = get_sudoku_by_difficulty(sudoku_list, 'medium')
+        return render_template('play.html', difficulty='medium', sudoku=list(puzzle['sudoku_generated']))
+    except ValueError as e:
+        flash(str(e), 'error')
+        return render_template('home.html')
 
 @main.route('/hard')
 def hard():
-    sudoku = '5..1.764..........413......2.....15.6.......7....754..7.4....6.86.2...1.......3.5'
-    return render_template('play.html', difficulty='hard',sudoku=list(sudoku))
+    try:
+        puzzle = get_sudoku_by_difficulty(sudoku_list, 'hard')  # Pass the level
+        return render_template('play.html', difficulty='hard', sudoku=list(puzzle['sudoku_generated']))
+    except ValueError as e:
+        flash(str(e), 'error')
+        return render_template('home.html')
 
 @main.route('/play')
 def play():
