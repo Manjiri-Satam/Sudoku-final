@@ -25,8 +25,11 @@ class SudokuGame:
             self.full_board = [row[:] for row in self.generator.board]
 
             # Get the number of initial clues based on difficulty level
-            self.num_clues = self.difficulty_levels.get(self.difficulty, self.difficulty_levels['easy'])
+            self.num_clues = self.difficulty_levels[self.difficulty]
             self._remove_numbers_to_puzzle(self.num_clues)
+
+            # Calculate the number of clues correctly
+            self.num_clues = sum(1 for row in self.generator.board for cell in row if cell != 0)
             self.num_empty = self.board_size ** 2 - self.num_clues
 
             # Check if the puzzle has at least 8 different numbers from 1 to 9
@@ -35,31 +38,22 @@ class SudokuGame:
         return self.generator.board
 
     def _remove_numbers_to_puzzle(self, initial_clues):
-        remaining_clues = self.board_size ** 2 - initial_clues
-        tries = 0
-        while remaining_clues > 0 and tries < 100:
-            self._remove_symmetric_numbers(4 if remaining_clues > 30 else 2)
-            remaining_clues -= (4 if remaining_clues > 30 else 2)
-            tries += 1
-            if not self._check_puzzle_validity():#If the puzzle is invalid, reset the board and try again
-                self.generator.board = [row[:] for row in self.full_board]
-                remaining_clues += (4 if remaining_clues > 30 else 2)
-                tries -= 1
+        total_clues_to_leave = initial_clues
+        current_clues = self.board_size ** 2  # Start with a full board
+        while current_clues > total_clues_to_leave:
+            if self._remove_symmetric_numbers():
+                current_clues -= 2  # Two numbers are removed in each successful operation
 
-    def _remove_symmetric_numbers(self, count):
-        cells_to_remove = 4 if count == 4 else 2
-        for _ in range(count // 2):
-            row1, col1, row2, col2 = self._get_diagonally_opposite_cells()
-            self.generator.board[row1][col1] = 0
-            self.generator.board[row2][col2] = 0
+    def _remove_symmetric_numbers(self):
+        for _ in range(100):  # A limit to avoid infinite loops
+            row, col = random.randint(0, self.board_size - 1), random.randint(0, self.board_size - 1)
+            row_opp, col_opp = self.board_size - 1 - row, self.board_size - 1 - col
+            if self.generator.board[row][col] != 0 and self.generator.board[row_opp][col_opp] != 0:
+                self.generator.board[row][col] = 0
+                self.generator.board[row_opp][col_opp] = 0
+                return True  # Successful removal
+        return False  # Failed to remove after many tries
 
-    def _get_diagonally_opposite_cells(self):
-        center = self.board_size // 2
-        row = random.randint(0, self.board_size - 1)
-        col = random.randint(0, self.board_size - 1)
-        row_opp = self.board_size - 1 - row
-        col_opp = self.board_size - 1 - col
-        return row, col, row_opp, col_opp
 
     def _has_single_solution(self):
         solver = UnifiedSolver(self.generator.board)
@@ -89,3 +83,4 @@ class SudokuGame:
 sudoku_game = SudokuGame(difficulty='hard')
 sudoku_game.generate_game()
 sudoku_game.print_board()
+
