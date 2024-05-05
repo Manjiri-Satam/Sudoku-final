@@ -1,5 +1,6 @@
 import random
 from sudoku_full_board import SudokuGenerator
+from Solver_experiment_unified import UnifiedSolver
 
 
 class SudokuGame:
@@ -40,7 +41,7 @@ class SudokuGame:
             self._remove_symmetric_numbers(4 if remaining_clues > 30 else 2)
             remaining_clues -= (4 if remaining_clues > 30 else 2)
             tries += 1
-            if not self._has_single_solution():
+            if not self._check_puzzle_validity():
                 # If not a single solution, restore and retry
                 self.generator.board = [row[:] for row in self.full_board]
                 remaining_clues += (4 if remaining_clues > 30 else 2)
@@ -62,9 +63,9 @@ class SudokuGame:
         return row, col, row_opp, col_opp
 
     def _has_single_solution(self):
-        # Placeholder for single solution check logic
-        # Implement using a backtracking solver or integrate an existing solver
-        return True  # Assuming a placeholder that always returns True
+        solver = UnifiedSolver(self.generator.board)
+        return not solver.has_single_solution()
+        #Replaced with the simpler sanity check below due to the exponential time complexity of checking this for every removal
 
     def _check_puzzle_validity(self):
         unique_numbers = set()
