@@ -41,8 +41,7 @@ class SudokuGame:
             self._remove_symmetric_numbers(4 if remaining_clues > 30 else 2)
             remaining_clues -= (4 if remaining_clues > 30 else 2)
             tries += 1
-            if not self._has_single_solution():
-                # If not a single solution, restore and retry
+            if not self._check_puzzle_validity():#If the puzzle is invalid, reset the board and try again
                 self.generator.board = [row[:] for row in self.full_board]
                 remaining_clues += (4 if remaining_clues > 30 else 2)
                 tries -= 1
