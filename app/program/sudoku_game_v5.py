@@ -1,5 +1,6 @@
 import random
 from sudoku_full_board import SudokuGenerator
+from Solver_experiment_unified import UnifiedSolver
 
 
 class SudokuGame:
@@ -62,9 +63,8 @@ class SudokuGame:
         return row, col, row_opp, col_opp
 
     def _has_single_solution(self):
-        # Placeholder for single solution check logic
-        # Implement using a backtracking solver or integrate an existing solver
-        return True  # Assuming a placeholder that always returns True
+        solver = UnifiedSolver(self.generator.board)
+        return not solver.has_single_solution()
 
     def _check_puzzle_validity(self):
         unique_numbers = set()
