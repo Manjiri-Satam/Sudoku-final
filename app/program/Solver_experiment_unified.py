@@ -23,7 +23,7 @@ class UnifiedSolver:
 
     def update_possible_values(self, row, col, num, is_placing): #once a cell is selected, and a number is input, then it updates the possible values for all affected cells by this input number. 
         affected_cells = self.get_affected_cells(row, col)
-        if not affected_cells_
+        if not affected_cells:
             raise Exception("No affected cells found.")
         if is_placing: #this determines if the number is being places or not (so to update or not)
             for r, c in affected_cells:
